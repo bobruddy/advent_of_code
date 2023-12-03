@@ -87,36 +87,37 @@ def find_gears(raw_input):
     """
     This is for part 2 of the question and will find the gears
 
-    Same as part 1 where i'm finding all the * and coordinates
-    around them then finding which numbers overlap. 
+    Loop through each of the found symbols. find coordinates where
+    a number would have to be. check to see if a number is in one
+    of them. if so capture that number. if the number of captured
+    numbers for each coordinate is exactly two then return that in
+    the loop
 
     """
     gear_pattern = '[' + re.escape('*') + ']'
-    gear_coordinates = []
+    list_o_gears = []
     for row_id, cur_row in enumerate(raw_input):
         # This finds the coorindates where a number has to be to be adjacent
         cur_row_indexes = {m.start(0) for m in re.finditer(gear_pattern, cur_row)}
         for col_id in cur_row_indexes:
-            gear_coordinates.append({
-                'rows': {row_id - 1, row_id, row_id + 1},
-                'cols': {col_id - 1, col_id, col_id + 1},
-            })
+            rows = {row_id - 1, row_id, row_id + 1}
+            cols = {col_id - 1, col_id, col_id + 1}
 
-    # for every pattern find overlapping part numbers
-    list_o_gears = []
-    for ast in gear_coordinates:
-        found_part = []         # list of find numbers per potential gear
-        col_list = ast.get('cols')
-        for row_id in ast.get('rows'):
-            # get all the numbers for thta tow and check for overlap by colum
-            numbers_in_row = find_numbers(raw_input[row_id])
-            for num in numbers_in_row:
-                if col_list.intersection(num.get('cols')):
-                    found_part.append(num.get('part_number'))
+            # for every pattern find overlapping part numbers
+            found_part = []  # list of find numbers per potential gear
+            for sym_row_id in rows:
+                # get all the numbers for thta tow and check for overlap by colum
+                # check we aren't over limits
+                if sym_row_id < 0 or row_id > len(raw_input) - 1:
+                    continue
+                numbers_in_row = find_numbers(raw_input[sym_row_id])
+                for num in numbers_in_row:
+                    if cols.intersection(num.get('cols')):
+                        found_part.append(num.get('part_number'))
 
-        # only save this combination if there are exactly two matches
-        if len(found_part) == 2:
-            list_o_gears.append(tuple(found_part))
+            # only save this combination if there are exactly two matches
+            if len(found_part) == 2:
+                list_o_gears.append(tuple(found_part))
 
     return list_o_gears
 
