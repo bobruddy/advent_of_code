@@ -5,6 +5,7 @@
 
 import re
 import string
+from functools import lru_cache
 
 
 def read_input(file: str):
@@ -62,6 +63,26 @@ def list_of_parts(raw_input):
     return part_numbers
 
 
+@lru_cache
+def find_numbers(row: str):
+    """
+    Find all the numbers in a row
+    """
+
+    numbers = []
+    # this finds the coordinates of all the numbers
+    for m in re.finditer(r'\d+', row):
+        number = m.group(0)
+        m_start = m.start()
+        m_end = m.end()
+        position = set(range(m_start, m_end))
+        numbers.append({
+            'cols': position,
+            'part_number': int(number)
+        })
+    return numbers
+
+
 def find_gears(raw_input):
     """
     This is for part 2 of the question and will find the gears
@@ -69,15 +90,9 @@ def find_gears(raw_input):
     Same as part 1 where i'm finding all the * and coordinates
     around them then finding which numbers overlap. 
 
-    I'm doing in three loops 1) find symbols 2) find numbers
-    3) find and return the intersections. I could do the 3rd
-    in the 2nd loop, with the number seach in a diff function
-    with lru_cache to make it go faster. but i've got to do 
-    some cleaning
     """
     gear_pattern = '[' + re.escape('*') + ']'
     gear_coordinates = []
-    number_coordinates = {}
     for row_id, cur_row in enumerate(raw_input):
         # This finds the coorindates where a number has to be to be adjacent
         cur_row_indexes = {m.start(0) for m in re.finditer(gear_pattern, cur_row)}
@@ -87,28 +102,15 @@ def find_gears(raw_input):
                 'cols': {col_id - 1, col_id, col_id + 1},
             })
 
-        # this finds the coordinates of all the numbers
-        for m in re.finditer(r'\d+', cur_row):
-            number = m.group(0)
-            m_start = m.start()
-            m_end = m.end()
-            position = set(range(m_start, m_end))
-            if not number_coordinates.get(row_id):
-                number_coordinates[row_id] = []
-            number_coordinates[row_id].append({
-                'cols': position,
-                'part_number': int(number)
-            })
-
     # for every pattern find overlapping part numbers
     list_o_gears = []
     for ast in gear_coordinates:
-        found_part = []
+        found_part = []         # list of find numbers per potential gear
         col_list = ast.get('cols')
         for row_id in ast.get('rows'):
             # get all the numbers for thta tow and check for overlap by colum
-            num_in_row = number_coordinates.get(row_id)
-            for num in num_in_row:
+            numbers_in_row = find_numbers(raw_input[row_id])
+            for num in numbers_in_row:
                 if col_list.intersection(num.get('cols')):
                     found_part.append(num.get('part_number'))
 
