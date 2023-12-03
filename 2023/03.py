@@ -5,6 +5,8 @@
 
 import re
 import string
+import sys
+import os
 from functools import lru_cache
 
 
@@ -95,10 +97,10 @@ def find_gears(raw_input):
 
     """
     gear_pattern = '[' + re.escape('*') + ']'
-    list_o_gears = []
+    re_gear = re.compile(gear_pattern)
     for row_id, cur_row in enumerate(raw_input):
         # This finds the coorindates where a number has to be to be adjacent
-        cur_row_indexes = {m.start(0) for m in re.finditer(gear_pattern, cur_row)}
+        cur_row_indexes = {m.start(0) for m in re_gear.finditer(cur_row)}
         for col_id in cur_row_indexes:
             rows = {row_id - 1, row_id, row_id + 1}
             cols = {col_id - 1, col_id, col_id + 1}
@@ -117,24 +119,25 @@ def find_gears(raw_input):
 
             # only save this combination if there are exactly two matches
             if len(found_part) == 2:
-                list_o_gears.append(tuple(found_part))
-
-    return list_o_gears
+                yield tuple(found_part)
 
 
 def main():
     """
     Solves part1/part2
     """
-    input_data = read_input('03.input')
+    for arg in sys.argv:
+        if arg.endswith('.input') and os.path.exists(arg):
+            file = arg
+            break
+    input_data = read_input(file)
 
     # part 1
-    # p_list = list_of_parts(input_data)
-    # print('Part 1:', sum(p_list))
+    p_list = list_of_parts(input_data)
+    print('Part 1:', sum(p_list))
 
     # part 2
     g_list = find_gears(input_data)
-    print(g_list)
     ratio_list = [g1 * g2 for g1, g2 in g_list]
     print('Part 2:', sum(ratio_list))
 
