@@ -9,7 +9,6 @@ import os
 from functools import lru_cache
 
 
-@lru_cache
 def read_input(file: str):
     """
     Read and parse input
