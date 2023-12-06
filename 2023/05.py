@@ -100,8 +100,8 @@ def proccess_list_o_seeds(r):
         if (min_val is None) or (m < min_val):
             min_val = m
 
-    end_time = start_time - time.time()
-    print( f"Finished seed range {seed_r} bin number {bin_num:,} out of {max_bin:,} in {end_time:,}")
+    end_time = time.time() - start_time
+    print(f"Finished seed range {seed_r} bin number {bin_num:,} out of {max_bin:,} in {end_time:,}")
     return min_val
 
 
@@ -135,16 +135,16 @@ def main():
         # this whole thing is breaking apart the task list
         # into 10MM chunks to process. Each chuck will then
         # be executed as a forked process in parallel
-        num_bin = math.ceil(leng/chunk)
+        num_bin = math.ceil(leng / chunk)
         for i in range(num_bin):
-            inc_s = start + (i*chunk)
-            inc_e = start + ((i+1)*chunk)
-            if (start+leng) < inc_e:
+            inc_s = start + (i * chunk)
+            inc_e = start + ((i + 1) * chunk)
+            if (start + leng) < inc_e:
                 inc_e = start + leng
 
-            l_seeds.append((inc_s, inc_e, map_data, s_range, i, num_bin ))
+            l_seeds.append((inc_s, inc_e, map_data, s_range, i, num_bin))
 
-    with Pool(processes=(os.cpu_count()-1)) as pool:
+    with Pool(processes=(os.cpu_count() - 1)) as pool:
         loc_list = pool.map(proccess_list_o_seeds, l_seeds)
 
     print('Part 2:', min(list(loc_list)))
