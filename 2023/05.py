@@ -86,13 +86,16 @@ def proccess_list_o_seeds(r):
     """
     Process a group of seeds
     """
-    loc_list = []
     s = r[0]
     l = r[1]
     mdata = r[2]
+    min_val = None
     for b in tqdm.tqdm(range(s, s + l)):
-        loc_list.append(find_loc('seed', b, mdata)[1])
-    return loc_list
+        m = find_loc('seed', b, mdata)[1]
+        if (min_val is None) or (m < min_val):
+            min_val = m
+
+    return min_val
 
 
 def main():
@@ -122,9 +125,7 @@ def main():
     with Pool(processes=20) as pool:
         loc_list = pool.map(proccess_list_o_seeds, l_seeds)
 
-    min_list = [min(x) for x in loc_list]
-
-    print('Part 2:', min(min_list))
+    print('Part 2:', min(list(loc_list)))
 
 
 if __name__ == '__main__':
