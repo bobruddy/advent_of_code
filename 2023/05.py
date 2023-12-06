@@ -7,9 +7,9 @@ import re
 import sys
 import os
 from functools import lru_cache
-import pprint
-import tqdm
 from multiprocessing import Pool
+import math
+import time
 
 
 def read_input(file: str) -> list:
@@ -58,9 +58,10 @@ def parse_data(base_data: list) -> tuple:
             oseeds = [int(x) for x in seeds_str.split(' ')]
             continue
 
-    return oseeds, mapping
+    return tuple(oseeds), tuple(mapping)
 
 
+@lru_cache
 def find_loc(loc_type: str, item: int, loc_data: list):
     """
     Traverse the hierarchy to find lowest point in this case "location"
@@ -86,15 +87,21 @@ def proccess_list_o_seeds(r):
     """
     Process a group of seeds
     """
+    start_time = time.time()
     s = r[0]
     l = r[1]
     mdata = r[2]
+    seed_r = r[3]
+    bin_num = r[4]
+    max_bin = r[5]
     min_val = None
-    for b in tqdm.tqdm(range(s, s + l)):
+    for b in range(s, l):
         m = find_loc('seed', b, mdata)[1]
         if (min_val is None) or (m < min_val):
             min_val = m
 
+    end_time = start_time - time.time()
+    print( f"Finished seed range {seed_r} bin number {bin_num:,} out of {max_bin:,} in {end_time:,}")
     return min_val
 
 
@@ -110,19 +117,34 @@ def main():
     orig_seeds, map_data = parse_data(input_data)
 
     # part 1
-    a = [find_loc('seed', seed, map_data)[1] for seed in orig_seeds]
+    a = [find_loc('seed', seed, (map_data))[1] for seed in orig_seeds]
     print('Part 1:', min(a))
 
     # part 2
-    orig_seeds.reverse()
+    # making a list and reversing so can use pop
+    reverse_seeds = list(orig_seeds)
+    reverse_seeds.reverse()
+
     loc_list = []
     l_seeds = []
-    for i in range(int(len(orig_seeds) / 2)):
-        start = orig_seeds.pop()
-        leng = orig_seeds.pop()
-        l_seeds.append((start, leng, map_data))
+    chunk = 10000000
+    for s_range in range(int(len(reverse_seeds) / 2)):
+        start = reverse_seeds.pop()
+        leng = reverse_seeds.pop()
 
-    with Pool(processes=20) as pool:
+        # this whole thing is breaking apart the task list
+        # into 10MM chunks to process. Each chuck will then
+        # be executed as a forked process in parallel
+        num_bin = math.ceil(leng/chunk)
+        for i in range(num_bin):
+            inc_s = start + (i*chunk)
+            inc_e = start + ((i+1)*chunk)
+            if (start+leng) < inc_e:
+                inc_e = start + leng
+
+            l_seeds.append((inc_s, inc_e, map_data, s_range, i, num_bin ))
+
+    with Pool(processes=(os.cpu_count()-1)) as pool:
         loc_list = pool.map(proccess_list_o_seeds, l_seeds)
 
     print('Part 2:', min(list(loc_list)))
