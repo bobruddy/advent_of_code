@@ -8,6 +8,8 @@ import sys
 import os
 from functools import lru_cache
 import pprint
+import tqdm
+from multiprocessing import Pool
 
 
 def read_input(file: str) -> list:
@@ -80,6 +82,19 @@ def find_loc(loc_type: str, item: int, loc_data: list):
     return (loc, position)
 
 
+def proccess_list_o_seeds(r):
+    """
+    Process a group of seeds
+    """
+    loc_list = []
+    s = r[0]
+    l = r[1]
+    mdata = r[2]
+    for b in tqdm.tqdm(range(s, s + l)):
+        loc_list.append(find_loc('seed', b, mdata)[1])
+    return loc_list
+
+
 def main():
     """
     Solves part1/part2
@@ -96,7 +111,20 @@ def main():
     print('Part 1:', min(a))
 
     # part 2
-    print('Part 2:', )
+    orig_seeds.reverse()
+    loc_list = []
+    l_seeds = []
+    for i in range(int(len(orig_seeds) / 2)):
+        start = orig_seeds.pop()
+        leng = orig_seeds.pop()
+        l_seeds.append((start, leng, map_data))
+
+    with Pool(processes=20) as pool:
+        loc_list = pool.map(proccess_list_o_seeds, l_seeds)
+
+    min_list = [min(x) for x in loc_list]
+
+    print('Part 2:', min(min_list))
 
 
 if __name__ == '__main__':
