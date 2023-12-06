@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
+"""
+2023 Day 02 Solution
+"""
 
 
 def read_input(file: str):
-    with open(file, 'r') as input:
-        raw_input = [x.strip() for x in input.readlines()]
+    """
+    Read and parse input
+    """
+    with open(file, 'r', encoding="utf-8") as fd:
+        raw_input = [x.strip() for x in fd.readlines()]
 
     clean_data = []
     for game_str in raw_input:
@@ -22,10 +28,13 @@ def read_input(file: str):
 
 
 def main():
+    """
+    Solves part1/part2
+    """
     inputs = read_input('02.input')
 
     # part 1
-    max_colors = (('blue', 14),  ('red', 12),  ('green',  13))
+    max_colors = (('blue', 14), ('red', 12), ('green', 13))
     all_games = {x.get('game_id') for x in inputs}
     not_possible_games = set()
     for color, draw_max in max_colors:
@@ -48,7 +57,7 @@ def main():
             if (new_max := turn.get(color)) is not None and existing_max < new_max:
                 games[game_id][color] = new_max
 
-    lin = [games[id].get('red')*games[id].get('blue')*games[id].get('green')
+    lin = [games[id].get('red') * games[id].get('blue') * games[id].get('green')
            for id in games.keys()]
     print('Part 2:', sum(list(lin)))
 

@@ -2,9 +2,6 @@
 
 import re
 
-with open('01.input', 'r') as input:
-    raw_input = [x.strip() for x in input.readlines()]
-
 
 # return only calibration number
 def return_cal(cal_str: str) -> int:
@@ -12,11 +9,6 @@ def return_cal(cal_str: str) -> int:
     return int(str(num_only[0]) + str(num_only[-1]))
 
 
-# part 1
-print('Part 1:', sum(list(map(return_cal, raw_input))))
-
-
-# part 2
 def replace_words(cal_str: str) -> str:
     replace_str = cal_str.lower()
     word_map = (
@@ -69,5 +61,16 @@ def swap_w_digits(raw_str: str) -> str:
     return str(orig_str)
 
 
-parsed_raw = list(map(swap_w_digits, raw_input))
-print('Part 2:', sum(list(map(return_cal, parsed_raw))))
+def main():
+    # part 1
+    with open('01.input', 'r') as input:
+        raw_input = [x.strip() for x in input.readlines()]
+    print('Part 1:', sum(list(map(return_cal, raw_input))))
+
+    # part 2
+    parsed_raw = list(map(swap_w_digits, raw_input))
+    print('Part 2:', sum(list(map(return_cal, parsed_raw))))
+
+
+if __name__ == '__main__':
+    main()
