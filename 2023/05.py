@@ -61,7 +61,6 @@ def parse_data(base_data: list) -> tuple:
     return tuple(oseeds), tuple(mapping)
 
 
-@lru_cache
 def find_loc(loc_type: str, item: int, loc_data: list):
     """
     Traverse the hierarchy to find lowest point in this case "location"
