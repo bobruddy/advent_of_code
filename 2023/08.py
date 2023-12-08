@@ -48,6 +48,9 @@ def parse_data(base_data: list) -> tuple:
 
 
 def find_end(start: str, end: set(), node_mapping: tuple, move_list: tuple) -> int:
+    """
+    Returns an steps: int to get from start to a node in set end
+    """
     current = start
     s = 0
     while not end.issuperset(set([current,])):
@@ -56,7 +59,6 @@ def find_end(start: str, end: set(), node_mapping: tuple, move_list: tuple) -> i
                 break
             current = node_mapping[current][m]
             s += 1
-
     return s
 
 
