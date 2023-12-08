@@ -4,16 +4,16 @@
 
 """
 
-import re
+# import re
 import sys
 import os
 from functools import lru_cache
-from multiprocessing import Pool
-import math
-import time
-import tqdm
-from collections import Counter
-from operator import itemgetter
+# from multiprocessing import Pool
+# import math
+# import time
+# import tqdm
+# from collections import Counter
+# from operator import itemgetter
 
 
 def read_input(file: str) -> list:
