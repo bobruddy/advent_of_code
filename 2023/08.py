@@ -78,10 +78,10 @@ def main():
     print('Part 1:', steps)
 
     # part 2
-    p2_current = [x for x in mapping.keys() if x.endswith('A')]
-    p2_end = set(x for x in mapping.keys() if x.endswith('Z'))
-    p2_steps_to_z = [find_end(s, p2_end, mapping, moves) for s in p2_current]
-    p2_steps = math.lcm(*p2_steps_to_z)
+    p2_current = [x for x in mapping.keys() if x.endswith('A')]     # find all starts
+    p2_end = set(x for x in mapping.keys() if x.endswith('Z'))      # find all ends
+    p2_steps_to_z = [find_end(s, p2_end, mapping, moves) for s in p2_current]   # find steps to an end for each start
+    p2_steps = math.lcm(*p2_steps_to_z)                             # find lcm of all steps
     print('Part 2:', p2_steps)  # 18215611419223
 
 
