@@ -9,7 +9,7 @@ import sys
 import os
 from functools import lru_cache
 # from multiprocessing import Pool
-# import math
+import math
 # import time
 # import tqdm
 # from collections import Counter
@@ -47,6 +47,19 @@ def parse_data(base_data: list) -> tuple:
     return instructions, data
 
 
+def find_end(start: str, end: set(), node_mapping: tuple, move_list: tuple) -> int:
+    current = start
+    s = 0
+    while not end.issuperset(set([current,])):
+        for m in move_list:
+            if end.issuperset(set([current, ])):
+                break
+            current = node_mapping[current][m]
+            s += 1
+
+    return s
+
+
 def main():
     """
     Solves part1/part2
@@ -59,42 +72,15 @@ def main():
     moves, mapping = parse_data(list(read_input(file)))
 
     # part 1
-
-    current = 'AAA'
-    steps = 0
-    while current != 'ZZZ':
-        for m in moves:
-            if current == 'ZZZ':
-                break
-            current = mapping[current][m]
-            steps += 1
-
+    steps = find_end('AAA', {'ZZZ'}, mapping, moves)
     print('Part 1:', steps)
 
     # part 2
-
     p2_current = [x for x in mapping.keys() if x.endswith('A')]
     p2_end = set(x for x in mapping.keys() if x.endswith('Z'))
-    p2_steps = 0
-
-    while not p2_end.issuperset(set(p2_current)):
-        for m in moves:
-            if p2_end.issuperset(set(p2_current)):
-                break
-
-            prev_current = p2_current
-            p2_current = []
-            # print('m', m)
-            for s in prev_current:
-                # print('s', s)
-                p2_current.append(mapping[s][m])
-            p2_steps += 1
-            if p2_steps % 1000 == 0:
-                print(p2_steps)
-
-    print(p2_current)
-    print(p2_end)
-    print('Part 2:', p2_steps)
+    p2_steps_to_z = [find_end(s, p2_end, mapping, moves) for s in p2_current]
+    p2_steps = math.lcm(*p2_steps_to_z)
+    print('Part 2:', p2_steps)  # 18215611419223
 
 
 if __name__ == '__main__':
